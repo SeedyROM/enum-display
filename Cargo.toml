@@ -1,6 +1,7 @@
 [package]
 name = "enum-display"
 description = "A macro to derive Display for enums"
+keywords = ["enum", "display", "derive", "macro"]
 version = "0.1.0"
 edition = "2021"
 license = "MIT"
