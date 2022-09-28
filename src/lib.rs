@@ -1,5 +1,5 @@
 //!
-//! EnumDisplay is a crate for implementing [`std::fmt::Display`] on enum variants with macros.
+//! enum-display is a crate for implementing [`std::fmt::Display`] on enum variants with macros.
 //!
 //! # Simple Example
 //!
