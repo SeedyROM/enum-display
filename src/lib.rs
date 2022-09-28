@@ -4,7 +4,7 @@
 //! # Simple Example
 //!
 //! ```rust
-//! use enum_display_derive::EnumDisplay;
+//! use enum_display_macro::EnumDisplay;
 //!
 //! #[derive(EnumDisplay)]
 //! enum Color {
@@ -23,7 +23,7 @@
 //! Any case from [convert_case](https://docs.rs/convert_case/latest/convert_case/) is supported.
 //!
 //! ```rust
-//! use enum_display_derive::EnumDisplay;
+//! use enum_display_macro::EnumDisplay;
 //!
 //! #[derive(EnumDisplay)]
 //! #[enum_display(case = "Kebab")]
@@ -34,7 +34,7 @@
 //! assert_eq!(Message::Hello { name: "Alice".to_string() }.to_string(), "hello-greeting");
 //!
 
-pub use enum_display_derive::*;
+pub use enum_display_macro::*;
 
 #[cfg(test)]
 mod tests {
