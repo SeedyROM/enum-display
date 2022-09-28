@@ -32,5 +32,5 @@ enum Message {
     HelloGreeting { name: String },
 }
 
-assert_eq!(Message::Hello { name: "Alice".to_string() }.to_string(), "hello-greeting");
+assert_eq!(Message::HelloGreeting { name: "Alice".to_string() }.to_string(), "hello-greeting");
 ```
