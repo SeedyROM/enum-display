@@ -1,7 +1,14 @@
 [package]
 name = "enum-display-derive"
+description = "A macro to derive Display for enums"
+keywords = ["enum", "display", "derive", "macro"]
 version = "0.1.0"
 edition = "2021"
+license = "MIT"
+documentation = "https://docs.rs/enum-display/tree/main/enum-display-derive"
+homepage = "https://github.com/SeedyROM/enum-display"
+repository = "https://github.com/SeedyROM/enum-display/tree/main/enum-display-derive"
+readme = "README.md"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
