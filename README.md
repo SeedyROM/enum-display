@@ -5,7 +5,7 @@
 # Simple Example
 
 ```rust
-use enum_display_derive::EnumDisplay;
+use enum_display::EnumDisplay;
 
 #[derive(EnumDisplay)]
 enum Color {
@@ -24,7 +24,7 @@ assert_eq!(Color::Blue.to_string(), "Blue");
 Any case from [convert_case](https://docs.rs/convert_case/latest/convert_case/) is supported.
 
 ```rust
-use enum_display_derive::EnumDisplay;
+use enum_display::EnumDisplay;
 
 #[derive(EnumDisplay)]
 #[enum_display(case = "Kebab")]
