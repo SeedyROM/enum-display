@@ -8,7 +8,6 @@ license = "MIT"
 documentation = "https://docs.rs/enum-display/tree/main/enum-display-derive"
 homepage = "https://github.com/SeedyROM/enum-display"
 repository = "https://github.com/SeedyROM/enum-display/tree/main/enum-display-derive"
-readme = "README.md"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
