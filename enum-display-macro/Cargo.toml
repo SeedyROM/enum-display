@@ -1,5 +1,5 @@
 [package]
-name = "enum-display-derive"
+name = "enum-display-macro"
 description = "A macro to derive Display for enums"
 keywords = ["enum", "display", "derive", "macro"]
 version = "0.1.0"
