@@ -7,7 +7,7 @@ edition = "2021"
 license = "MIT"
 documentation = "https://docs.rs/enum-display"
 homepage = "https://github.com/SeedyROM/enum-display"
-repository = "https://github.com/SeedyROM/repository"
+repository = "https://github.com/SeedyROM/enum-display"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
