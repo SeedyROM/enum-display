@@ -71,23 +71,31 @@ pub fn derive(input: TokenStream) -> TokenStream {
 
         match variant.fields {
             syn::Fields::Named(_) => quote! {
-                #ident { .. } => write!(f, #ident_str),
+                #ident { .. } => #ident_str,
             },
             syn::Fields::Unnamed(_) => quote! {
-                #ident(..) => write!(f, #ident_str),
+                #ident(..) => #ident_str,
             },
             syn::Fields::Unit => quote! {
-                #ident => write!(f, #ident_str),
+                #ident => #ident_str,
             },
         }
     });
 
+    // #[allow(unused_qualifications)] is needed
+    // due to https://github.com/SeedyROM/enum-display/issues/1
+    // Possibly related to https://github.com/rust-lang/rust/issues/96698
     let output = quote! {
-        impl std::fmt::Display for #ident {
-            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                match self {
-                    #(#ident::#variants)*
-                }
+        #[automatically_derived]
+        #[allow(unused_qualifications)]
+        impl ::core::fmt::Display for #ident {
+            fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+                ::core::fmt::Formatter::write_str(
+                    f,
+                    match self {
+                        #(#ident::#variants)*
+                    },
+                )
             }
         }
     };

@@ -69,49 +69,52 @@ mod tests {
 
     #[test]
     fn test_unit_field_variant() {
-        assert!(TestEnum::Name.to_string() == "Name");
+        assert_eq!(TestEnum::Name.to_string(), "Name");
     }
 
     #[test]
     fn test_named_fields_variant() {
-        assert!(
+        assert_eq!(
             TestEnum::Address {
                 street: "123 Main St".to_string(),
                 city: "Any Town".to_string(),
                 state: "CA".to_string(),
                 zip: "12345".to_string()
             }
-            .to_string()
-                == "Address"
+            .to_string(),
+            "Address"
         );
     }
 
     #[test]
     fn test_unnamed_fields_variant() {
-        assert!(TestEnum::DateOfBirth(1, 1, 2000).to_string() == "DateOfBirth");
+        assert_eq!(TestEnum::DateOfBirth(1, 1, 2000).to_string(), "DateOfBirth");
     }
 
     #[test]
     fn test_unit_field_variant_case_transform() {
-        assert!(TestEnumWithAttribute::Name.to_string() == "name");
+        assert_eq!(TestEnumWithAttribute::Name.to_string(), "name");
     }
 
     #[test]
     fn test_named_fields_variant_case_transform() {
-        assert!(
+        assert_eq!(
             TestEnumWithAttribute::Address {
                 street: "123 Main St".to_string(),
                 city: "Any Town".to_string(),
                 state: "CA".to_string(),
                 zip: "12345".to_string()
             }
-            .to_string()
-                == "address"
+            .to_string(),
+            "address"
         );
     }
 
     #[test]
     fn test_unnamed_fields_variant_case_transform() {
-        assert!(TestEnumWithAttribute::DateOfBirth(1, 1, 2000).to_string() == "date-of-birth");
+        assert_eq!(
+            TestEnumWithAttribute::DateOfBirth(1, 1, 2000).to_string(),
+            "date-of-birth"
+        );
     }
 }
