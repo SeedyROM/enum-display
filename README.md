@@ -3,7 +3,7 @@
 [![GitHub](https://img.shields.io/badge/github-enum--display-8da0cb?logo=github)](https://github.com/SeedyROM/enum-display)
 [![crates.io version](https://img.shields.io/crates/v/enum-display.svg)](https://crates.io/crates/enum-display)
 [![docs.rs docs](https://docs.rs/enum-display/badge.svg)](https://docs.rs/enum-display)
-[![crates.io version](https://img.shields.io/crates/l/enum-display.svg)](https://github.com/SeedyROM/enum-display/blob/main/LICENSE-APACHE)
+[![crates.io version](https://img.shields.io/crates/l/enum-display.svg)](https://github.com/SeedyROM/enum-display/blob/main/LICENSE)
 [![CI build](https://github.com/SeedyROM/enum-display/actions/workflows/rust.yml/badge.svg)](https://github.com/SeedyROM/enum-display/actions)
 
 `enum-display` is a crate for implementing `std::fmt::Display` on enum variants with macros.
