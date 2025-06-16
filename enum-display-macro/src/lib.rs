@@ -30,7 +30,7 @@ fn parse_case_name(case_name: &str) -> Case {
 pub fn derive(input: TokenStream) -> TokenStream {
     // Parse the input tokens into a syntax tree
     let DeriveInput {
-        ident, data, attrs, ..
+        ident, data, attrs, generics, ..
     } = parse_macro_input!(input);
 
     // Should we transform the case of the enum variants?
@@ -82,13 +82,16 @@ pub fn derive(input: TokenStream) -> TokenStream {
         }
     });
 
+    // Copy generics and bounds
+    let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
+
     // #[allow(unused_qualifications)] is needed
     // due to https://github.com/SeedyROM/enum-display/issues/1
     // Possibly related to https://github.com/rust-lang/rust/issues/96698
     let output = quote! {
         #[automatically_derived]
         #[allow(unused_qualifications)]
-        impl ::core::fmt::Display for #ident {
+        impl #impl_generics ::core::fmt::Display for #ident #ty_generics #where_clause {
             fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
                 ::core::fmt::Formatter::write_str(
                     f,

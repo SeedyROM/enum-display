@@ -67,6 +67,19 @@ mod tests {
         DateOfBirth(u32, u32, u32),
     }
 
+    #[allow(dead_code)]
+    #[derive(EnumDisplay)]
+    enum TestEnumWithGenerics<'a, T: Clone> where T: std::fmt::Display {
+        Name,
+        Address {
+            street: &'a T,
+            city: &'a T,
+            state: &'a T,
+            zip: &'a T,
+        },
+        DateOfBirth(u32, u32, u32),
+    }
+
     #[test]
     fn test_unit_field_variant() {
         assert_eq!(TestEnum::Name.to_string(), "Name");
@@ -116,5 +129,29 @@ mod tests {
             TestEnumWithAttribute::DateOfBirth(1, 1, 2000).to_string(),
             "date-of-birth"
         );
+    }
+
+    #[test]
+    fn test_unit_field_variant_with_generics() {
+        assert_eq!(TestEnumWithGenerics::<'_, String>::Name.to_string(), "Name");
+    }
+
+    #[test]
+    fn test_named_fields_variant_with_generics() {
+        assert_eq!(
+            TestEnumWithGenerics::Address {
+                street: &"123 Main St".to_string(),
+                city: &"Any Town".to_string(),
+                state: &"CA".to_string(),
+                zip: &"12345".to_string()
+            }
+            .to_string(),
+            "Address"
+        );
+    }
+
+    #[test]
+    fn test_unnamed_fields_variant_with_generics() {
+        assert_eq!(TestEnumWithGenerics::<'_, String>::DateOfBirth(1, 1, 2000).to_string(), "DateOfBirth");
     }
 }
