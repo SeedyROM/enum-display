@@ -1,5 +1,3 @@
-use std::{collections::HashSet, fmt::format};
-
 use convert_case::{Case, Casing};
 use proc_macro::{self, TokenStream};
 use proc_macro2::Span;
@@ -109,18 +107,6 @@ impl VariantAttrs {
         })
         .to_string()
     }
-
-    // Makes a hash set of user referenced format args so we can output minimal generated code
-    fn read_named_placeholders(&self) -> HashSet<&str> {
-        if let Some(fmt) = &self.format {
-            let re = Regex::new(r"\{\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*[^}]*\}").unwrap();
-            re.captures_iter(&fmt)
-                .filter_map(|caps| caps.get(1).map(|m| m.as_str()))
-                .collect()
-        } else {
-            HashSet::new()
-        }
-    }
 }
 
 // Shared intermediate variant info
@@ -138,29 +124,19 @@ struct NamedVariantIR {
 
 impl NamedVariantIR {
     fn from_fields_named(fields_named: FieldsNamed, info: VariantInfo) -> Self {
-        let referenced_fields = info.attrs.read_named_placeholders();
-        if referenced_fields.is_empty() {
-            Self { info, fields: Vec::new() }
-        } else {
-            let fields = fields_named
-                .named
-                .into_iter()
-                .filter_map(|field| {
-                    let ident = field.ident.unwrap();
-                    referenced_fields
-                        .contains(ident.to_string().as_str())
-                        .then_some(ident)
-                })
-                .collect();
-            Self { info, fields }
-        }
+        let fields = fields_named
+            .named
+            .into_iter()
+            .filter_map(|field| field.ident)
+            .collect();
+        Self { info, fields }
     }
 
     fn gen(self, any_has_format: bool) -> proc_macro2::TokenStream {
         let VariantInfo { ident, ident_transformed, attrs } = self.info;
         let fields = self.fields;
         match (any_has_format, attrs.format) {
-            (true, Some(fmt)) => quote! { #ident { #(#fields),*, .. } => { let variant = #ident_transformed; format!(#fmt) } },
+            (true, Some(fmt)) => quote! { #ident { #(#fields),* } => { let variant = #ident_transformed; format!(#fmt) } },
             (true, None) => quote! { #ident { .. } => String::from(#ident_transformed), },
             (false, None) => quote! { #ident { .. } => #ident_transformed, },
             _ => unreachable!("`any_has_format` should never be false when a variant has format string"),
@@ -176,26 +152,13 @@ struct UnnamedVariantIR {
 
 impl UnnamedVariantIR {
     fn from_fields_unnamed(fields_unnamed: FieldsUnnamed, info: VariantInfo) -> Self {
-        let referenced_fields = info.attrs.read_named_placeholders();
-        if referenced_fields.is_empty() {
-            Self { info, fields: Vec::new() }
-        } else {
-            let skip_field = "_";
-            let fields: Vec<Ident> = fields_unnamed
-                .unnamed
-                .into_iter()
-                .enumerate()
-                .map(|(i, _)| {
-                    Ident::new(
-                        referenced_fields
-                            .get(format!("_unnamed_{i}").as_str())
-                            .unwrap_or(&skip_field),
-                        Span::call_site(),
-                    )
-                })
-                .collect();
-            Self { info, fields }
-        }
+        let fields: Vec<Ident> = fields_unnamed
+            .unnamed
+            .into_iter()
+            .enumerate()
+            .map(|(i, _)| Ident::new(format!("_unnamed_{i}").as_str(), Span::call_site()))
+            .collect();
+        Self { info, fields }
     }
 
     fn gen(self, any_has_format: bool) -> proc_macro2::TokenStream {
