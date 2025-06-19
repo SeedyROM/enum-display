@@ -44,13 +44,40 @@ mod tests {
     #[derive(EnumDisplay)]
     enum TestEnum {
         Name,
+
+        #[variant_display(format = "Unit: {variant}")]
+        NameFullFormat,
+
         Address {
             street: String,
             city: String,
             state: String,
             zip: String,
         },
+
+        #[variant_display(format = "Named: {variant} {{{street}, {zip}}}")]
+        AddressPartialFormat {
+            street: String,
+            city: String,
+            state: String,
+            zip: String,
+        },
+
+        #[variant_display(format = "Named: {variant} {{{street}, {city}, {state}, {zip}}}")]
+        AddressFullFormat {
+            street: String,
+            city: String,
+            state: String,
+            zip: String,
+        },
+
         DateOfBirth(u32, u32, u32),
+
+        #[variant_display(format = "Unnamed: {variant}({2})")]
+        DateOfBirthPartialFormat(u32, u32, u32),
+
+        #[variant_display(format = "Unnamed: {variant}({0}, {1}, {2})")]
+        DateOfBirthFullFormat(u32, u32, u32),
     }
 
     #[allow(dead_code)]
@@ -83,6 +110,7 @@ mod tests {
     #[test]
     fn test_unit_field_variant() {
         assert_eq!(TestEnum::Name.to_string(), "Name");
+        assert_eq!(TestEnum::NameFullFormat.to_string(), "Unit: NameFullFormat");
     }
 
     #[test]
@@ -97,11 +125,33 @@ mod tests {
             .to_string(),
             "Address"
         );
+        assert_eq!(
+            TestEnum::AddressPartialFormat {
+                street: "123 Main St".to_string(),
+                city: "Any Town".to_string(),
+                state: "CA".to_string(),
+                zip: "12345".to_string()
+            }
+            .to_string(),
+            "Named: AddressPartialFormat {123 Main St, 12345}"
+        );
+        assert_eq!(
+            TestEnum::AddressFullFormat {
+                street: "123 Main St".to_string(),
+                city: "Any Town".to_string(),
+                state: "CA".to_string(),
+                zip: "12345".to_string()
+            }
+            .to_string(),
+            "Named: AddressFullFormat {123 Main St, Any Town, CA, 12345}"
+        );
     }
 
     #[test]
     fn test_unnamed_fields_variant() {
-        assert_eq!(TestEnum::DateOfBirth(1, 1, 2000).to_string(), "DateOfBirth");
+        assert_eq!(TestEnum::DateOfBirth(1, 2, 1999).to_string(), "DateOfBirth");
+        assert_eq!(TestEnum::DateOfBirthPartialFormat(1, 2, 1999).to_string(), "Unnamed: DateOfBirthPartialFormat(1999)");
+        assert_eq!(TestEnum::DateOfBirthFullFormat(1, 2, 1999).to_string(), "Unnamed: DateOfBirthFullFormat(1, 2, 1999)");
     }
 
     #[test]
