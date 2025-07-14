@@ -85,7 +85,9 @@ impl VariantAttrs {
                         if let syn::NestedMeta::Meta(syn::Meta::NameValue(name_value)) = nested {
                             if name_value.path.is_ident("format") {
                                 if let syn::Lit::Str(lit_str) = name_value.lit {
-                                    format = Some(Self::translate_numeric_placeholders(&lit_str.value()));
+                                    format = Some(Self::translate_numeric_placeholders(
+                                        &lit_str.value(),
+                                    ));
                                 }
                             }
                         }
@@ -132,14 +134,22 @@ impl NamedVariantIR {
         Self { info, fields }
     }
 
-    fn gen(self, any_has_format: bool) -> proc_macro2::TokenStream {
-        let VariantInfo { ident, ident_transformed, attrs } = self.info;
+    fn genereate(self, any_has_format: bool) -> proc_macro2::TokenStream {
+        let VariantInfo {
+            ident,
+            ident_transformed,
+            attrs,
+        } = self.info;
         let fields = self.fields;
         match (any_has_format, attrs.format) {
-            (true, Some(fmt)) => quote! { #ident { #(#fields),* } => { let variant = #ident_transformed; format!(#fmt) } },
+            (true, Some(fmt)) => {
+                quote! { #ident { #(#fields),* } => { let variant = #ident_transformed; format!(#fmt) } }
+            }
             (true, None) => quote! { #ident { .. } => String::from(#ident_transformed), },
             (false, None) => quote! { #ident { .. } => #ident_transformed, },
-            _ => unreachable!("`any_has_format` should never be false when a variant has format string"),
+            _ => unreachable!(
+                "`any_has_format` should never be false when a variant has format string"
+            ),
         }
     }
 }
@@ -161,14 +171,22 @@ impl UnnamedVariantIR {
         Self { info, fields }
     }
 
-    fn gen(self, any_has_format: bool) -> proc_macro2::TokenStream {
-        let VariantInfo { ident, ident_transformed, attrs } = self.info;
+    fn generate(self, any_has_format: bool) -> proc_macro2::TokenStream {
+        let VariantInfo {
+            ident,
+            ident_transformed,
+            attrs,
+        } = self.info;
         let fields = self.fields;
         match (any_has_format, attrs.format) {
-            (true, Some(fmt)) => quote! { #ident(#(#fields),*) => { let variant = #ident_transformed; format!(#fmt) } },
+            (true, Some(fmt)) => {
+                quote! { #ident(#(#fields),*) => { let variant = #ident_transformed; format!(#fmt) } }
+            }
             (true, None) => quote! { #ident(..) => String::from(#ident_transformed), },
             (false, None) => quote! { #ident(..) => #ident_transformed, },
-            _ => unreachable!("`any_has_format` should never be false when a variant has format string"),
+            _ => unreachable!(
+                "`any_has_format` should never be false when a variant has format string"
+            ),
         }
     }
 }
@@ -183,13 +201,21 @@ impl UnitVariantIR {
         Self { info }
     }
 
-    fn gen(self, any_has_format: bool) -> proc_macro2::TokenStream {
-        let VariantInfo { ident, ident_transformed, attrs } = self.info;
+    fn generate(self, any_has_format: bool) -> proc_macro2::TokenStream {
+        let VariantInfo {
+            ident,
+            ident_transformed,
+            attrs,
+        } = self.info;
         match (any_has_format, attrs.format) {
-            (true, Some(fmt)) => quote! { #ident => { let variant = #ident_transformed; format!(#fmt) } },
+            (true, Some(fmt)) => {
+                quote! { #ident => { let variant = #ident_transformed; format!(#fmt) } }
+            }
             (true, None) => quote! { #ident => String::from(#ident_transformed), },
             (false, None) => quote! { #ident => #ident_transformed, },
-            _ => unreachable!("`any_has_format` should never be false when a variant has format string"),
+            _ => unreachable!(
+                "`any_has_format` should never be false when a variant has format string"
+            ),
         }
     }
 }
@@ -212,19 +238,19 @@ impl VariantIR {
         match variant.fields {
             syn::Fields::Named(fields_named) => {
                 Self::Named(NamedVariantIR::from_fields_named(fields_named, info))
-            },
+            }
             syn::Fields::Unnamed(fields_unnamed) => {
                 Self::Unnamed(UnnamedVariantIR::from_fields_unnamed(fields_unnamed, info))
-            },
+            }
             syn::Fields::Unit => Self::Unit(UnitVariantIR::new(info)),
         }
     }
 
-    fn gen(self, any_has_format: bool) -> proc_macro2::TokenStream {
+    fn generate(self, any_has_format: bool) -> proc_macro2::TokenStream {
         match self {
-            VariantIR::Named(named_variant) => named_variant.gen(any_has_format),
-            VariantIR::Unnamed(unnamed_variant) => unnamed_variant.gen(any_has_format),
-            VariantIR::Unit(unit_variant) => unit_variant.gen(any_has_format),
+            VariantIR::Named(named_variant) => named_variant.generate(any_has_format),
+            VariantIR::Unnamed(unnamed_variant) => unnamed_variant.generate(any_has_format),
+            VariantIR::Unit(unit_variant) => unit_variant.generate(any_has_format),
         }
     }
 
@@ -233,7 +259,10 @@ impl VariantIR {
             VariantIR::Named(named_variant) => &named_variant.info,
             VariantIR::Unnamed(unnamed_variant) => &unnamed_variant.info,
             VariantIR::Unit(unit_variant) => &unit_variant.info,
-        }.attrs.format.is_some()
+        }
+        .attrs
+        .format
+        .is_some()
     }
 }
 
@@ -266,10 +295,16 @@ pub fn derive(input: TokenStream) -> TokenStream {
     // If any variants have a format string, the output of all match arms must be String instead of &str
     // This is because we can't return a reference to the temporary output of format!()
     let any_has_format = intermediate_variants.iter().any(|v| v.has_format());
-    let post_fix = if any_has_format { quote!{ .as_str() } } else { quote! { } };
+    let post_fix = if any_has_format {
+        quote! { .as_str() }
+    } else {
+        quote! {}
+    };
 
     // Build the match arms
-    let variants = intermediate_variants.into_iter().map(|v| v.gen(any_has_format));
+    let variants = intermediate_variants
+        .into_iter()
+        .map(|v| v.generate(any_has_format));
 
     // #[allow(unused_qualifications)] is needed
     // due to https://github.com/SeedyROM/enum-display/issues/1
