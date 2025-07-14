@@ -13,4 +13,4 @@ homepage = "https://github.com/SeedyROM/enum-display"
 repository = "https://github.com/SeedyROM/enum-display"
 
 [dependencies]
-enum-display-macro = { path = "./enum-display-macro" }
+enum-display-macro = { version = "0.1.5", path = "./enum-display-macro" }
