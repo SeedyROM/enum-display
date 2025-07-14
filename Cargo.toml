@@ -1,3 +1,6 @@
+[workspace]
+members = [".", "enum-display-macro"]
+
 [package]
 name = "enum-display"
 description = "A macro to derive Display for enums"
@@ -9,7 +12,5 @@ documentation = "https://docs.rs/enum-display"
 homepage = "https://github.com/SeedyROM/enum-display"
 repository = "https://github.com/SeedyROM/enum-display"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
-enum-display-macro = { version = "0.1.5" }
+enum-display-macro = { path = "./enum-display-macro" }

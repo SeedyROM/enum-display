@@ -96,7 +96,10 @@ mod tests {
 
     #[allow(dead_code)]
     #[derive(EnumDisplay)]
-    enum TestEnumWithGenerics<'a, T: Clone> where T: std::fmt::Display {
+    enum TestEnumWithGenerics<'a, T: Clone>
+    where
+        T: std::fmt::Display,
+    {
         Name,
         Address {
             street: &'a T,
@@ -150,8 +153,14 @@ mod tests {
     #[test]
     fn test_unnamed_fields_variant() {
         assert_eq!(TestEnum::DateOfBirth(1, 2, 1999).to_string(), "DateOfBirth");
-        assert_eq!(TestEnum::DateOfBirthPartialFormat(1, 2, 1999).to_string(), "Unnamed: DateOfBirthPartialFormat(1999)");
-        assert_eq!(TestEnum::DateOfBirthFullFormat(1, 2, 1999).to_string(), "Unnamed: DateOfBirthFullFormat(1, 2, 1999)");
+        assert_eq!(
+            TestEnum::DateOfBirthPartialFormat(1, 2, 1999).to_string(),
+            "Unnamed: DateOfBirthPartialFormat(1999)"
+        );
+        assert_eq!(
+            TestEnum::DateOfBirthFullFormat(1, 2, 1999).to_string(),
+            "Unnamed: DateOfBirthFullFormat(1, 2, 1999)"
+        );
     }
 
     #[test]
@@ -202,6 +211,9 @@ mod tests {
 
     #[test]
     fn test_unnamed_fields_variant_with_generics() {
-        assert_eq!(TestEnumWithGenerics::<'_, String>::DateOfBirth(1, 1, 2000).to_string(), "DateOfBirth");
+        assert_eq!(
+            TestEnumWithGenerics::<'_, String>::DateOfBirth(1, 1, 2000).to_string(),
+            "DateOfBirth"
+        );
     }
 }

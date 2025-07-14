@@ -54,7 +54,7 @@ impl EnumAttrs {
             "Flat" => Case::Flat,
             "UpperFlat" => Case::UpperFlat,
             "Alternating" => Case::Alternating,
-            _ => panic!("Unrecognized case name: {}", case_name),
+            _ => panic!("Unrecognized case name: {case_name}"),
         }
     }
 
@@ -105,7 +105,7 @@ impl VariantAttrs {
         re.replace_all(fmt, |caps: &regex::Captures| {
             let idx = &caps[1];
             let fmt_spec = &caps[2];
-            format!("{{_unnamed_{}{} }}", idx, fmt_spec)
+            format!("{{_unnamed_{idx}{fmt_spec}}}")
         })
         .to_string()
     }
@@ -134,7 +134,7 @@ impl NamedVariantIR {
         Self { info, fields }
     }
 
-    fn genereate(self, any_has_format: bool) -> proc_macro2::TokenStream {
+    fn generate(self, any_has_format: bool) -> proc_macro2::TokenStream {
         let VariantInfo {
             ident,
             ident_transformed,
