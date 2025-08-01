@@ -32,8 +32,42 @@
 //! }
 //!
 //! assert_eq!(Message::HelloGreeting { name: "Alice".to_string() }.to_string(), "hello-greeting");
+//! ```
 //!
-
+//! # Example With Custom Formatting
+//!
+//! Display output can be customised with a format string passed to the `display` enum
+//! variant attribute.
+//!
+//! The case converted variant name is available via the `variant` named parameter.
+//!
+//! Additional parameters available to the format string depend on the type of enum variant:
+//!
+//! | Variant Type     | Format String Field Access                                                        | Example                             |
+//! |------------------|-----------------------------------------------------------------------------------|-------------------------------------|
+//! | Named            | [Named Parameters](https://doc.rust-lang.org/std/fmt/#named-parameters)           | `"{variant} name field is: {name}"` |
+//! | Unnamed (tuple)  | [Positional Parameters](https://doc.rust-lang.org/std/fmt/#positional-parameters) | `"{variant} age field is: {0}"`     |
+//! | Unit             | No additional fields available                                                    | `"{variant} has no fields"`         |
+//!
+//! ```rust
+//! use enum_display::EnumDisplay;
+//!
+//! #[derive(EnumDisplay)]
+//! enum Message {
+//!     #[display("{variant} {name}!")]
+//!     Hello { name: String },
+//!
+//!     #[display("{variant}? {0}")]
+//!     HowOld(usize),
+//!
+//!     #[display("{variant}!")]
+//!     Wow,
+//! }
+//!
+//! assert_eq!(Message::Hello { name: "Alice".to_string() }.to_string(), "Hello Alice!");
+//! assert_eq!(Message::HowOld(123).to_string(), "HowOld? 123");
+//! assert_eq!(Message::Wow.to_string(), "Wow!");
+//! ```
 pub use enum_display_macro::*;
 
 #[cfg(test)]
