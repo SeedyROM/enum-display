@@ -99,7 +99,7 @@ mod tests {
 
     #[allow(dead_code)]
     #[derive(EnumDisplay)]
-    enum TestEnumWithGenerics<'a, T: Clone>
+    enum TestEnumWithLifetimeAndGenerics<'a, T: Clone>
     where
         T: std::fmt::Display,
     {
@@ -195,14 +195,17 @@ mod tests {
     }
 
     #[test]
-    fn test_unit_field_variant_with_generics() {
-        assert_eq!(TestEnumWithGenerics::<'_, String>::Name.to_string(), "Name");
+    fn test_unit_field_variant_with_lifetime_and_generics() {
+        assert_eq!(
+            TestEnumWithLifetimeAndGenerics::<'_, String>::Name.to_string(),
+            "Name"
+        );
     }
 
     #[test]
-    fn test_named_fields_variant_with_generics() {
+    fn test_named_fields_variant_with_lifetime_and_generics() {
         assert_eq!(
-            TestEnumWithGenerics::Address {
+            TestEnumWithLifetimeAndGenerics::Address {
                 street: &"123 Main St".to_string(),
                 city: &"Any Town".to_string(),
                 state: &"CA".to_string(),
@@ -214,9 +217,9 @@ mod tests {
     }
 
     #[test]
-    fn test_unnamed_fields_variant_with_generics() {
+    fn test_unnamed_fields_variant_with_lifetime_and_generics() {
         assert_eq!(
-            TestEnumWithGenerics::<'_, String>::DateOfBirth(1, 1, 2000).to_string(),
+            TestEnumWithLifetimeAndGenerics::<'_, String>::DateOfBirth(1, 1, 2000).to_string(),
             "DateOfBirth"
         );
     }
