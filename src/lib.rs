@@ -45,7 +45,10 @@ mod tests {
     enum TestEnum {
         Name,
 
-        #[variant_display(format = "Unit: {variant}")]
+        #[display(format = "Overridden Name")]
+        OverrideName,
+
+        #[display(format = "Unit: {variant}")]
         NameFullFormat,
 
         Address {
@@ -55,7 +58,7 @@ mod tests {
             zip: String,
         },
 
-        #[variant_display(format = "Named: {variant} {{{street}, {zip}}}")]
+        #[display(format = "Named: {variant} {{{street}, {zip}}}")]
         AddressPartialFormat {
             street: String,
             city: String,
@@ -63,7 +66,7 @@ mod tests {
             zip: String,
         },
 
-        #[variant_display(format = "Named: {variant} {{{street}, {city}, {state}, {zip}}}")]
+        #[display(format = "Named: {variant} {{{street}, {city}, {state}, {zip}}}")]
         AddressFullFormat {
             street: String,
             city: String,
@@ -73,10 +76,10 @@ mod tests {
 
         DateOfBirth(u32, u32, u32),
 
-        #[variant_display(format = "Unnamed: {variant}({2})")]
+        #[display(format = "Unnamed: {variant}({2})")]
         DateOfBirthPartialFormat(u32, u32, u32),
 
-        #[variant_display(format = "Unnamed: {variant}({0}, {1}, {2})")]
+        #[display(format = "Unnamed: {variant}({0}, {1}, {2})")]
         DateOfBirthFullFormat(u32, u32, u32),
     }
 
@@ -113,6 +116,7 @@ mod tests {
     #[test]
     fn test_unit_field_variant() {
         assert_eq!(TestEnum::Name.to_string(), "Name");
+        assert_eq!(TestEnum::OverrideName.to_string(), "Overridden Name");
         assert_eq!(TestEnum::NameFullFormat.to_string(), "Unit: NameFullFormat");
     }
 

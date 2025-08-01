@@ -76,20 +76,27 @@ impl VariantAttrs {
     fn from_attrs(attrs: Vec<Attribute>) -> Self {
         let mut format = None;
 
-        // Find the variant_display attribute
+        // Find the display attribute
         for attr in attrs.into_iter() {
-            if attr.path.is_ident("variant_display") {
+            if attr.path.is_ident("display") {
                 let meta = attr.parse_meta().unwrap();
                 if let syn::Meta::List(list) = meta {
-                    for nested in list.nested {
-                        if let syn::NestedMeta::Meta(syn::Meta::NameValue(name_value)) = nested {
-                            if name_value.path.is_ident("format") {
-                                if let syn::Lit::Str(lit_str) = name_value.lit {
+                    if let Some(first_nested) = list.nested.first() {
+                        match first_nested {
+                            // Handle literal string: #[display("format string")]
+                            syn::NestedMeta::Lit(syn::Lit::Str(lit_str)) => {
+                                format =
+                                    Some(Self::translate_numeric_placeholders(&lit_str.value()));
+                            }
+                            // Handle named value: #[display(format = "format string")]
+                            syn::NestedMeta::Meta(syn::Meta::NameValue(name_value)) => {
+                                if let syn::Lit::Str(lit_str) = &name_value.lit {
                                     format = Some(Self::translate_numeric_placeholders(
                                         &lit_str.value(),
                                     ));
                                 }
                             }
+                            _ => {}
                         }
                     }
                 }
@@ -266,7 +273,7 @@ impl VariantIR {
     }
 }
 
-#[proc_macro_derive(EnumDisplay, attributes(enum_display, variant_display))]
+#[proc_macro_derive(EnumDisplay, attributes(enum_display, display))]
 pub fn derive(input: TokenStream) -> TokenStream {
     // Parse the input tokens into a syntax tree
     let DeriveInput {
