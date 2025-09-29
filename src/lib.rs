@@ -1,5 +1,8 @@
 //!
-//! enum-display is a crate for implementing [`std::fmt::Display`] on enum variants with macros.
+//! enum-display is a crate for implementing [`core::fmt::Display`] on enum variants with macros.
+//!
+//! This crate supports both `std` and `no_std` environments. In `no_std` mode, it works
+//! without allocation by writing directly to the formatter.
 //!
 //! # Simple Example
 //!
@@ -31,7 +34,25 @@
 //!     HelloGreeting { name: String },
 //! }
 //!
+//! # #[cfg(feature = "std")]
 //! assert_eq!(Message::HelloGreeting { name: "Alice".to_string() }.to_string(), "hello-greeting");
+//! ```
+//!
+//! # No-std Usage
+//!
+//! This crate works in `no_std` environments:
+//!
+//! ```rust
+//! # #![cfg_attr(not(feature = "std"), no_std)]
+//! use enum_display::EnumDisplay;
+//!
+//! #[derive(EnumDisplay)]
+//! enum Status {
+//!     Ready,
+//!
+//!     #[display("Error: {code}")]
+//!     Error { code: u32 },
+//! }
 //! ```
 //!
 //! # Example With Custom Variant Formatting
@@ -68,11 +89,23 @@
 //! assert_eq!(Conversation::HowOld(123).to_string(), "HowOld? 123");
 //! assert_eq!(Conversation::Wow.to_string(), "Wow!");
 //! ```
+
+#![cfg_attr(not(feature = "std"), no_std)]
+
 pub use enum_display_macro::*;
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[cfg(feature = "std")]
+    use std::string::{String, ToString};
+
+    #[cfg(not(feature = "std"))]
+    extern crate alloc;
+
+    #[cfg(not(feature = "std"))]
+    use alloc::string::{String, ToString};
 
     #[allow(dead_code)]
     #[derive(EnumDisplay)]
@@ -135,7 +168,7 @@ mod tests {
     #[derive(EnumDisplay)]
     enum TestEnumWithLifetimeAndGenerics<'a, T: Clone>
     where
-        T: std::fmt::Display,
+        T: core::fmt::Display,
     {
         Name,
         Address {

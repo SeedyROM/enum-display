@@ -14,3 +14,18 @@ repository = "https://github.com/SeedyROM/enum-display"
 
 [dependencies]
 enum-display-macro = { version = "0.1.5", path = "./enum-display-macro" }
+
+[features]
+default = ["std"]
+std = []
+
+[dev-dependencies]
+static_assertions = "1.1"
+
+[[test]]
+name = "no_std_integration"
+required-features = []
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]

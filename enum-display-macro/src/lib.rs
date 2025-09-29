@@ -150,9 +150,14 @@ impl NamedVariantIR {
         let fields = self.fields;
         match (any_has_format, attrs.format) {
             (true, Some(fmt)) => {
-                quote! { #ident { #(#fields),* } => { let variant = #ident_transformed; format!(#fmt) } }
+                quote! { #ident { #(#fields),* } => {
+                    let variant = #ident_transformed;
+                    ::core::write!(f, #fmt)
+                } }
             }
-            (true, None) => quote! { #ident { .. } => String::from(#ident_transformed), },
+            (true, None) => {
+                quote! { #ident { .. } => ::core::fmt::Formatter::write_str(f, #ident_transformed), }
+            }
             (false, None) => quote! { #ident { .. } => #ident_transformed, },
             _ => unreachable!(
                 "`any_has_format` should never be false when a variant has format string"
@@ -187,9 +192,14 @@ impl UnnamedVariantIR {
         let fields = self.fields;
         match (any_has_format, attrs.format) {
             (true, Some(fmt)) => {
-                quote! { #ident(#(#fields),*) => { let variant = #ident_transformed; format!(#fmt) } }
+                quote! { #ident(#(#fields),*) => {
+                    let variant = #ident_transformed;
+                    ::core::write!(f, #fmt)
+                } }
             }
-            (true, None) => quote! { #ident(..) => String::from(#ident_transformed), },
+            (true, None) => {
+                quote! { #ident(..) => ::core::fmt::Formatter::write_str(f, #ident_transformed), }
+            }
             (false, None) => quote! { #ident(..) => #ident_transformed, },
             _ => unreachable!(
                 "`any_has_format` should never be false when a variant has format string"
@@ -216,9 +226,14 @@ impl UnitVariantIR {
         } = self.info;
         match (any_has_format, attrs.format) {
             (true, Some(fmt)) => {
-                quote! { #ident => { let variant = #ident_transformed; format!(#fmt) } }
+                quote! { #ident => {
+                    let variant = #ident_transformed;
+                    ::core::write!(f, #fmt)
+                } }
             }
-            (true, None) => quote! { #ident => String::from(#ident_transformed), },
+            (true, None) => {
+                quote! { #ident => ::core::fmt::Formatter::write_str(f, #ident_transformed), }
+            }
             (false, None) => quote! { #ident => #ident_transformed, },
             _ => unreachable!(
                 "`any_has_format` should never be false when a variant has format string"
@@ -299,36 +314,44 @@ pub fn derive(input: TokenStream) -> TokenStream {
     .map(|variant| VariantIR::from_variant(variant, &enum_attrs))
     .collect();
 
-    // If any variants have a format string, the output of all match arms must be String instead of &str
-    // This is because we can't return a reference to the temporary output of format!()
+    // If any variants have a format string, we need to handle formatting differently
     let any_has_format = intermediate_variants.iter().any(|v| v.has_format());
-    let post_fix = if any_has_format {
-        quote! { .as_str() }
-    } else {
-        quote! {}
-    };
 
     // Build the match arms
     let variants = intermediate_variants
         .into_iter()
         .map(|v| v.generate(any_has_format));
 
-    // #[allow(unused_qualifications)] is needed
-    // due to https://github.com/SeedyROM/enum-display/issues/1
-    // Possibly related to https://github.com/rust-lang/rust/issues/96698
-    let output = quote! {
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
-        impl #impl_generics ::core::fmt::Display for #ident #ty_generics #where_clause {
-            fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
-                ::core::fmt::Formatter::write_str(
-                    f,
+    let output = if any_has_format {
+        // When format strings are present, we write directly to the formatter
+        quote! {
+            #[automatically_derived]
+            #[allow(unused_qualifications)]
+            impl #impl_generics ::core::fmt::Display for #ident #ty_generics #where_clause {
+                fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
                     match self {
                         #(Self::#variants)*
-                    }#post_fix
-                )
+                    }
+                }
+            }
+        }
+    } else {
+        // When no format strings, we can return &str directly
+        quote! {
+            #[automatically_derived]
+            #[allow(unused_qualifications)]
+            impl #impl_generics ::core::fmt::Display for #ident #ty_generics #where_clause {
+                fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(
+                        f,
+                        match self {
+                            #(Self::#variants)*
+                        }
+                    )
+                }
             }
         }
     };
+
     output.into()
 }
