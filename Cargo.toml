@@ -5,7 +5,7 @@ members = [".", "enum-display-macro"]
 name = "enum-display"
 description = "A macro to derive Display for enums"
 keywords = ["enum", "display", "derive", "macro"]
-version = "0.1.5"
+version = "0.2.0"
 edition = "2021"
 license = "MIT"
 documentation = "https://docs.rs/enum-display"
@@ -13,7 +13,7 @@ homepage = "https://github.com/SeedyROM/enum-display"
 repository = "https://github.com/SeedyROM/enum-display"
 
 [dependencies]
-enum-display-macro = { version = "0.1.5", path = "./enum-display-macro" }
+enum-display-macro = { version = "0.2.0", path = "./enum-display-macro" }
 
 [features]
 default = ["std"]
