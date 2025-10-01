@@ -2,7 +2,7 @@
 name = "enum-display-macro"
 description = "A macro to derive Display for enums"
 keywords = ["enum", "display", "derive", "macro"]
-version = "0.1.4"
+version = "0.1.5"
 edition = "2021"
 license = "MIT"
 documentation = "https://docs.rs/enum-display/tree/main/enum-display-derive"
@@ -12,9 +12,11 @@ repository = "https://github.com/SeedyROM/enum-display/tree/main/enum-display-de
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+proc-macro2 = "1.0.95"
 convert_case = "0.6.0"
 quote = "1.0.21"
 syn = { version = "1.0.101", features = ["full"] }
+regex = "1.11.1"
 
 [lib]
 proc-macro = true
