@@ -43,7 +43,7 @@ fn main() {
 }
 ```
 
-# Simple Example
+## Simple Example
 
 ```rust
 use enum_display::EnumDisplay;
@@ -60,7 +60,7 @@ assert_eq!(Color::Green.to_string(), "Green");
 assert_eq!(Color::Blue.to_string(), "Blue");
 ```
 
-# Example With Custom Case Transform
+## Example With Custom Case Transform
 
 Any case from [convert_case](https://docs.rs/convert_case/latest/convert_case/) is supported.
 
@@ -76,11 +76,11 @@ enum Message {
 assert_eq!(Message::HelloGreeting { name: "Alice".to_string() }.to_string(), "hello-greeting");
 ```
 
-# Custom Variant Formatting with `#[display]`
+## Custom Variant Formatting with `#[display]`
 
 The `#[display]` attribute allows you to customize how individual enum variants are formatted. This attribute accepts a format string that follows Rust's standard formatting syntax.
 
-## Basic Usage
+### Basic Usage
 
 ```rust
 use enum_display::EnumDisplay;
@@ -100,7 +100,7 @@ assert_eq!(Status::Ready.to_string(), "System is ready");
 assert_eq!(Status::Success.to_string(), "Success: Operation completed");
 ```
 
-## Field Access Patterns
+### Field Access Patterns
 
 The `#[display]` attribute provides different ways to access variant data:
 
